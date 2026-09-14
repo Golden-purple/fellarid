@@ -4,7 +4,7 @@ Visual patterns captured from the first React implementation. These patterns mir
 
 ### Entry / Butterfly Reveal
 
-File: `src/App.tsx`, `src/styles.css`, `public/butterfly-being.png`
+File: `src/App.tsx`, `src/styles.css`, `public/butterfly.png`
 Last updated: 2026-09-14
 
 | Property         | Pattern |
@@ -117,7 +117,7 @@ Last updated: 2026-09-14
 
 ### Butterfly Transition Overlay
 
-File: `src/App.tsx`, `src/styles.css`, `public/butterfly-being.png`
+File: `src/App.tsx`, `src/styles.css`, `public/butterfly.png`
 Last updated: 2026-09-14
 
 | Property         | Pattern |
@@ -132,4 +132,4 @@ Last updated: 2026-09-14
 | Shadow           | Controlled butterfly drop shadow plus limited cyan/magenta channel separation |
 | Accent usage     | Supplied RGB/glitch raster artwork with temporary cyan and magenta trail highlights |
 
-**Pattern notes:** The overlay is mounted only for navigation, travels diagonally across the viewport, and switches the destination at the trail expansion peak. Forward motion runs left-to-right; reverse motion runs right-to-left. Both the static Entry mark and the moving overlay use the canonical `public/butterfly.png`; wing masks reuse that same image and animate around separate roots to create the flap. Future major-surface navigation should request this coordinator rather than duplicating butterfly markup. Reduced motion removes the flight and uses a short veil-only reveal.
+**Pattern notes:** The overlay is mounted only for navigation, travels diagonally across the viewport, and switches the destination at the trail expansion peak. Forward motion runs left-to-right; reverse motion runs right-to-left. The moving overlay uses the canonical `public/butterfly.png`; wing masks reuse that same image and animate around separate roots to create the flap. Forward flight applies a horizontal flip to the internal butterfly artwork only, so the reverse flight keeps the asset's original orientation while its path and timing remain unchanged. Future major-surface navigation should request this coordinator rather than duplicating butterfly markup. Reduced motion removes the flight and uses a short veil-only reveal.

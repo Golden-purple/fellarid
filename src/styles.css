@@ -167,6 +167,7 @@ button:focus-visible { outline: 2px solid var(--accent-soft); outline-offset: 3p
 .transition-reverse .transition-flight { animation-name: flight-reverse; }
 .transition-butterfly-art { position: absolute; top: 0; right: 0; width: min(24vw, 280px); transform-origin: 50% 50%; filter: drop-shadow(-5px 0 rgba(113, 231, 242, .28)) drop-shadow(6px 0 rgba(240, 80, 208, .3)); }
 .flight-butterfly { position: relative; width: 100%; aspect-ratio: 393 / 509; perspective: 820px; transform-style: preserve-3d; }
+.transition-forward .flight-butterfly { transform: scaleX(-1); }
 .flight-butterfly > .butterfly-image { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; opacity: .62; filter: saturate(1.2) contrast(1.1) brightness(1.12) drop-shadow(0 22px 28px rgba(0, 0, 0, .65)); }
 .flight-wing-mask { position: absolute; inset: 0; display: block; transform-style: preserve-3d; backface-visibility: hidden; will-change: transform; }
 .flight-wing-mask .butterfly-image { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; filter: saturate(1.24) contrast(1.12) brightness(1.16) drop-shadow(0 10px 14px rgba(240, 80, 208, .18)); }
