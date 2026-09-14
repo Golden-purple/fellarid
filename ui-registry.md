@@ -4,7 +4,7 @@ Visual patterns captured from the first React implementation. These patterns mir
 
 ### Entry / Butterfly Reveal
 
-File: `src/App.tsx`, `src/styles.css`
+File: `src/App.tsx`, `src/styles.css`, `public/butterfly-being.png`
 Last updated: 2026-09-14
 
 | Property         | Pattern |
@@ -17,9 +17,9 @@ Last updated: 2026-09-14
 | Spacing          | Wide editorial measure, `clamp()` section spacing |
 | Hover state      | `translateY(-2px)` on primary action |
 | Shadow           | Controlled dark butterfly grounding shadow only |
-| Accent usage     | `#8B70A5` / `#A98FBD` for action and butterfly wings |
+| Accent usage     | Supplied RGB/glitch raster artwork with restrained violet atmosphere |
 
-**Pattern notes:** The entry is an editorial split composition. The butterfly is a focused purple/violet emblem with layered wing planes, hairline structure, and a dark shadow silhouette; it is not a persistent background.
+**Pattern notes:** The entry is an editorial split composition. The butterfly uses the supplied reconstructed raster asset with screen blending so its black grounding and grid integrate into the existing canvas; it is not a persistent background animation.
 
 ### Opportunity Row
 
@@ -114,3 +114,22 @@ Last updated: 2026-09-14
 - Controls: 4px radius
 - Panels: 8px radius
 - Modal-scale surfaces: 12px radius
+
+### Butterfly Transition Overlay
+
+File: `src/App.tsx`, `src/styles.css`, `public/butterfly-being.png`
+Last updated: 2026-09-14
+
+| Property         | Pattern |
+| ---------------- | ------- |
+| Background       | Temporary near-black radial transition veil with restrained violet radiance |
+| Border           | None; scanline texture provides the temporary field structure |
+| Border radius    | None; the overlay is viewport-scale |
+| Text — primary   | None; the layer is decorative and `aria-hidden` |
+| Text — secondary | None |
+| Spacing          | Fixed viewport overlay; one flight layer with a bounded 13-fragment trail |
+| Hover state      | None; pointer events remain disabled during navigation |
+| Shadow           | Controlled butterfly drop shadow plus limited cyan/magenta channel separation |
+| Accent usage     | Supplied RGB/glitch raster artwork with temporary cyan and magenta trail highlights |
+
+**Pattern notes:** The overlay is mounted only for navigation, travels diagonally across the viewport, and switches the destination at the trail expansion peak. Forward motion runs left-to-right; reverse motion runs right-to-left. Both the static Entry mark and the moving overlay use `public/butterfly-being.png`; future major-surface navigation should request this coordinator rather than duplicating butterfly markup. Reduced motion removes the flight and uses a short veil-only reveal.

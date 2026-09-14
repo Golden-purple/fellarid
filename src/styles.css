@@ -17,6 +17,8 @@
   --border-strong: #3d3647;
   --accent: #8b70a5;
   --accent-soft: #a98fbd;
+  --glitch-cyan: #71e7f2;
+  --glitch-magenta: #f050d0;
 }
 
 * { box-sizing: border-box; }
@@ -26,8 +28,6 @@ button, a { -webkit-tap-highlight-color: transparent; }
 button:focus-visible { outline: 2px solid var(--accent-soft); outline-offset: 3px; }
 .app-shell { min-height: 100dvh; overflow-x: hidden; }
 .mono { font-family: 'JetBrains Mono', monospace; }
-.page-transition { animation: page-in 520ms cubic-bezier(.16, 1, .3, 1) both; }
-@keyframes page-in { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
 
 .entry-screen { min-height: 100dvh; padding: 32px clamp(24px, 5vw, 84px) 30px; display: flex; flex-direction: column; background: radial-gradient(circle at 70% 34%, rgba(139, 112, 165, .1), transparent 34%), var(--canvas); }
 .entry-topbar, .product-header { display: flex; align-items: center; gap: 16px; border-bottom: 1px solid var(--border); padding-bottom: 18px; }
@@ -46,11 +46,8 @@ button:focus-visible { outline: 2px solid var(--accent-soft); outline-offset: 3p
 .button-primary:hover { background: #c2a8d1; }
 .entry-transition { color: var(--quiet); font-size: 10px; line-height: 1.6; }
 .butterfly-stage { position: relative; min-height: 450px; display: grid; place-items: center; }
-.butterfly { width: min(100%, 520px); position: relative; z-index: 1; filter: drop-shadow(0 16px 22px rgba(0, 0, 0, .45)); animation: butterfly-float 8s ease-in-out infinite; }
+.butterfly-image { display: block; position: relative; z-index: 1; width: min(100%, 360px); height: min(72vh, 520px); object-fit: contain; mix-blend-mode: screen; filter: saturate(1.16) contrast(1.08) brightness(1.08) drop-shadow(0 16px 22px rgba(0, 0, 0, .45)); }
 .butterfly-shadow { position: absolute; width: 270px; height: 55px; border-radius: 50%; background: rgba(5, 4, 8, .8); filter: blur(18px); transform: translateY(158px); }
-@keyframes butterfly-float { 0%, 100% { transform: translateY(0) rotate(-1deg); } 50% { transform: translateY(-12px) rotate(1deg); } }
-.wing-lines { animation: wing-pulse 6s ease-in-out infinite; }
-@keyframes wing-pulse { 0%, 100% { opacity: .65; } 50% { opacity: 1; } }
 .entry-chain { display: grid; grid-template-columns: repeat(4, 1fr); max-width: 1380px; width: 100%; margin: 0 auto; border-top: 1px solid var(--border); }
 .chain-step { display: flex; gap: 14px; padding: 18px 20px 0 0; min-height: 72px; }
 .chain-step + .chain-step { border-left: 1px solid var(--border); padding-left: 20px; }
@@ -160,6 +157,73 @@ button:focus-visible { outline: 2px solid var(--accent-soft); outline-offset: 3p
 .state-explanation { max-width: 600px; margin: 22px 0 26px; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 18px 0; color: var(--muted); font-size: 12px; line-height: 1.7; }
 .state-actions { display: flex; align-items: center; gap: 20px; }
 
+/* The butterfly is a temporary navigation layer. Page content stays still
+   until the trail reaches its expansion peak, then the overlay clears. */
+.butterfly-transition { position: fixed; inset: 0; z-index: 50; overflow: hidden; pointer-events: none; isolation: isolate; }
+.transition-veil { position: absolute; inset: -8%; z-index: 1; background: radial-gradient(circle at 50% 50%, rgba(24, 16, 31, .96), rgba(8, 7, 12, .98) 58%, rgba(3, 3, 6, .99)); opacity: 0; animation: transition-veil 1450ms cubic-bezier(.19, .78, .24, 1) both; }
+.transition-veil::after { position: absolute; content: ''; inset: 0; background: repeating-linear-gradient(180deg, transparent 0 5px, rgba(139, 112, 165, .08) 6px, transparent 7px); mix-blend-mode: screen; opacity: .7; }
+.transition-radiance { position: absolute; inset: -30%; z-index: 2; background: conic-gradient(from 210deg at 50% 50%, transparent 0 22%, rgba(113, 231, 242, .12) 27%, transparent 34%, rgba(240, 80, 208, .2) 40%, transparent 52%, rgba(139, 112, 165, .16) 62%, transparent 72%); filter: blur(24px); opacity: 0; mix-blend-mode: screen; animation: transition-radiance 1450ms ease-out both; }
+.transition-flight { position: absolute; top: 0; left: 0; z-index: 4; width: min(31vw, 360px); height: 310px; transform-origin: 50% 50%; animation: flight-forward 1320ms cubic-bezier(.12, .72, .18, 1) both; }
+.transition-reverse .transition-flight { animation-name: flight-reverse; }
+.transition-butterfly-art { position: absolute; top: 0; right: 0; width: min(24vw, 280px); transform-origin: 50% 50%; filter: drop-shadow(-5px 0 rgba(113, 231, 242, .28)) drop-shadow(6px 0 rgba(240, 80, 208, .3)); animation: butterfly-wingbeat 190ms steps(2, end) infinite alternate; }
+.transition-butterfly-art .butterfly-image { width: 100%; height: auto; filter: saturate(1.2) contrast(1.1) brightness(1.12) drop-shadow(0 22px 28px rgba(0, 0, 0, .65)); }
+.digital-trail { position: absolute; top: 65px; left: -155px; width: 335px; height: 180px; transform: rotate(-3deg); filter: drop-shadow(0 0 10px rgba(139, 112, 165, .28)); }
+.trail-core { position: absolute; top: 82px; left: 10px; width: 290px; height: 5px; background: linear-gradient(90deg, transparent, rgba(113, 231, 242, .72) 35%, rgba(240, 80, 208, .86) 75%, transparent); filter: blur(4px); opacity: .8; }
+.trail-fragment { position: absolute; display: block; height: var(--fragment-height, 3px); left: var(--fragment-left, 40px); top: var(--fragment-top, 50px); width: var(--fragment-width, 120px); background: linear-gradient(90deg, transparent, rgba(139, 112, 165, .9) 12%, var(--fragment-color, rgba(240, 80, 208, .95)) 58%, transparent); clip-path: polygon(0 20%, 78% 0, 100% 34%, 87% 100%, 14% 72%); opacity: .72; animation: fragment-flicker 360ms steps(2, end) infinite alternate; }
+.trail-fragment:nth-child(2) { --fragment-left: 8px; --fragment-top: 26px; --fragment-width: 165px; --fragment-height: 5px; --fragment-color: var(--glitch-cyan); }
+.trail-fragment:nth-child(3) { --fragment-left: 74px; --fragment-top: 45px; --fragment-width: 220px; --fragment-height: 2px; --fragment-color: var(--glitch-magenta); animation-delay: -120ms; }
+.trail-fragment:nth-child(4) { --fragment-left: 18px; --fragment-top: 62px; --fragment-width: 112px; --fragment-height: 7px; --fragment-color: var(--glitch-cyan); animation-delay: -240ms; }
+.trail-fragment:nth-child(5) { --fragment-left: 112px; --fragment-top: 78px; --fragment-width: 170px; --fragment-height: 3px; --fragment-color: var(--glitch-magenta); }
+.trail-fragment:nth-child(6) { --fragment-left: 34px; --fragment-top: 95px; --fragment-width: 245px; --fragment-height: 4px; --fragment-color: var(--glitch-cyan); animation-delay: -70ms; }
+.trail-fragment:nth-child(7) { --fragment-left: 2px; --fragment-top: 114px; --fragment-width: 140px; --fragment-height: 2px; --fragment-color: var(--glitch-magenta); }
+.trail-fragment:nth-child(8) { --fragment-left: 86px; --fragment-top: 128px; --fragment-width: 190px; --fragment-height: 6px; --fragment-color: var(--glitch-cyan); animation-delay: -190ms; }
+.trail-fragment:nth-child(9) { --fragment-left: 44px; --fragment-top: 146px; --fragment-width: 120px; --fragment-height: 3px; --fragment-color: var(--glitch-magenta); }
+.trail-fragment:nth-child(10) { --fragment-left: 154px; --fragment-top: 32px; --fragment-width: 96px; --fragment-height: 2px; --fragment-color: var(--glitch-cyan); animation-delay: -260ms; }
+.trail-fragment:nth-child(11) { --fragment-left: 126px; --fragment-top: 164px; --fragment-width: 156px; --fragment-height: 4px; --fragment-color: var(--glitch-magenta); }
+.trail-fragment:nth-child(12) { --fragment-left: 12px; --fragment-top: 154px; --fragment-width: 82px; --fragment-height: 2px; --fragment-color: var(--glitch-cyan); animation-delay: -150ms; }
+.trail-fragment:nth-child(13) { --fragment-left: 210px; --fragment-top: 58px; --fragment-width: 90px; --fragment-height: 3px; --fragment-color: var(--glitch-magenta); }
+.trail-fragment:nth-child(14) { --fragment-left: 180px; --fragment-top: 116px; --fragment-width: 124px; --fragment-height: 2px; --fragment-color: var(--glitch-cyan); animation-delay: -310ms; }
+
+@keyframes transition-veil {
+  0%, 21% { opacity: 0; transform: scale(.92); }
+  42% { opacity: .92; transform: scale(1.02); }
+  68% { opacity: .82; transform: scale(1.08); }
+  100% { opacity: 0; transform: scale(1.2); }
+}
+@keyframes transition-radiance {
+  0%, 18% { opacity: 0; transform: rotate(-12deg) scale(.7); }
+  42% { opacity: .9; transform: rotate(10deg) scale(1); }
+  72% { opacity: .55; transform: rotate(24deg) scale(1.18); }
+  100% { opacity: 0; transform: rotate(38deg) scale(1.4); }
+}
+@keyframes flight-forward {
+  0% { opacity: 0; transform: translate3d(-31vw, 55vh, 0) rotate(-14deg) scale(.46); }
+  8% { opacity: 1; }
+  38% { opacity: 1; transform: translate3d(18vw, 43vh, 0) rotate(-2deg) scale(.8); }
+  68% { opacity: 1; transform: translate3d(63vw, 27vh, 0) rotate(11deg) scale(1.12); }
+  89% { opacity: .8; transform: translate3d(91vw, 16vh, 0) rotate(18deg) scale(1.04); }
+  100% { opacity: 0; transform: translate3d(116vw, 7vh, 0) rotate(24deg) scale(.78); }
+}
+@keyframes flight-reverse {
+  0% { opacity: 0; transform: translate3d(116vw, 7vh, 0) rotate(-24deg) scale(.78); }
+  8% { opacity: 1; }
+  38% { opacity: 1; transform: translate3d(91vw, 16vh, 0) rotate(-18deg) scale(1.04); }
+  68% { opacity: 1; transform: translate3d(45vw, 31vh, 0) rotate(-9deg) scale(1.12); }
+  89% { opacity: .8; transform: translate3d(6vw, 48vh, 0) rotate(4deg) scale(.9); }
+  100% { opacity: 0; transform: translate3d(-31vw, 55vh, 0) rotate(14deg) scale(.46); }
+}
+@keyframes butterfly-wingbeat {
+  from { transform: scaleX(.92) scaleY(1); }
+  to { transform: scaleX(1.04) scaleY(.96); }
+}
+@keyframes fragment-flicker {
+  from { opacity: .4; transform: translateX(0) scaleX(.82); }
+  to { opacity: .95; transform: translateX(9px) scaleX(1.08); }
+}
+.butterfly-transition.is-reduced .transition-veil { opacity: 1; animation: reduced-transition-veil 190ms ease-out both; }
+.butterfly-transition.is-reduced .transition-radiance { display: none; }
+@keyframes reduced-transition-veil { 0% { opacity: 1; } 55% { opacity: 1; } 100% { opacity: 0; } }
+
 @media (max-width: 980px) {
   .entry-grid, .discovery-grid, .detail-grid, .detail-heading { grid-template-columns: 1fr; }
   .butterfly-stage { min-height: 330px; order: -1; }
@@ -191,8 +255,13 @@ button:focus-visible { outline: 2px solid var(--accent-soft); outline-offset: 3p
   .detail-section-content { padding-left: 0; }
   .context-lines > div { grid-template-columns: 120px minmax(0, 1fr); }
   .state-switcher { align-self: flex-start; }
+  .transition-flight { width: 250px; height: 240px; }
+  .butterfly-stage .butterfly-image { width: auto; height: min(44vh, 300px); }
+  .transition-butterfly-art { width: 180px; }
+  .digital-trail { left: -128px; transform: scale(.78) rotate(-3deg); transform-origin: right center; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; }
+  .butterfly-transition.is-reduced .transition-veil { animation-duration: 190ms !important; animation-iteration-count: 1 !important; }
 }

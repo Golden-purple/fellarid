@@ -1,8 +1,15 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
 
 type View = 'entry' | 'discovery' | 'detail' | 'states'
 type StateMode = 'loading' | 'empty' | 'error'
+type TransitionDirection = 'forward' | 'reverse'
+
+type TransitionRequest = {
+  id: number
+  target: View
+  direction: TransitionDirection
+}
 
 type Factor = {
   name: string
@@ -92,22 +99,37 @@ function App() {
   const [view, setView] = useState<View>('entry')
   const [selectedId, setSelectedId] = useState(opportunities[1].id)
   const [stateMode, setStateMode] = useState<StateMode>('loading')
+  const [transition, setTransition] = useState<TransitionRequest | null>(null)
+  const [transitionId, setTransitionId] = useState(0)
   const selected = opportunities.find((opportunity) => opportunity.id === selectedId) ?? opportunities[1]
 
-  const openDetail = (id: string) => {
-    setSelectedId(id)
-    setView('detail')
+  const navigate = (target: View, opportunityId?: string) => {
+    if (transition || target === view) return
+    if (opportunityId) setSelectedId(opportunityId)
+
+    const direction: TransitionDirection = target === 'entry' || (view === 'detail' && target === 'discovery') ? 'reverse' : 'forward'
+    const nextTransitionId = transitionId + 1
+    setTransitionId(nextTransitionId)
+    setTransition({ id: nextTransitionId, target, direction })
   }
 
   return (
     <main className="app-shell">
-      {view === 'entry' && <Entry onEnter={() => setView('discovery')} />}
+      {view === 'entry' && <Entry onEnter={() => navigate('discovery')} />}
       {view !== 'entry' && (
-        <ProductShell view={view} onNavigate={setView}>
-          {view === 'discovery' && <Discovery onOpen={openDetail} />}
-          {view === 'detail' && <Detail opportunity={selected} onBack={() => setView('discovery')} />}
+        <ProductShell view={view} onNavigate={navigate}>
+          {view === 'discovery' && <Discovery onOpen={(id) => navigate('detail', id)} />}
+          {view === 'detail' && <Detail opportunity={selected} onBack={() => navigate('discovery')} />}
           {view === 'states' && <States mode={stateMode} onModeChange={setStateMode} />}
         </ProductShell>
+      )}
+      {transition && (
+        <ButterflyTransition
+          key={transition.id}
+          request={transition}
+          onReveal={() => setView(transition.target)}
+          onComplete={() => setTransition(null)}
+        />
       )}
     </main>
   )
@@ -115,7 +137,7 @@ function App() {
 
 function Entry({ onEnter }: { onEnter: () => void }) {
   return (
-    <section className="entry-screen page-transition">
+    <section className="entry-screen">
       <div className="entry-topbar">
         <div className="wordmark">FellaRide</div>
         <div className="entry-product-label">Opportunity Intelligence</div>
@@ -152,39 +174,60 @@ function ButterflyMark() {
   return (
     <div className="butterfly-stage" aria-label="Layered purple butterfly emblem">
       <div className="butterfly-shadow" />
-      <svg className="butterfly" viewBox="0 0 520 420" role="img" aria-hidden="true">
-        <defs>
-          <linearGradient id="wing-violet-left" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0" stopColor="#b59acb" stopOpacity="0.9" />
-            <stop offset="0.5" stopColor="#8b70a5" stopOpacity="0.8" />
-            <stop offset="1" stopColor="#4c385d" stopOpacity="0.7" />
-          </linearGradient>
-          <linearGradient id="wing-violet-right" x1="1" y1="0" x2="0" y2="1">
-            <stop offset="0" stopColor="#c6addb" stopOpacity="0.85" />
-            <stop offset="0.55" stopColor="#8b70a5" stopOpacity="0.78" />
-            <stop offset="1" stopColor="#3b2c49" stopOpacity="0.8" />
-          </linearGradient>
-          <filter id="soft-shadow" x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur stdDeviation="16" />
-          </filter>
-        </defs>
-        <g className="butterfly-wings">
-          <path d="M254 208C225 142 133 40 50 72c-46 18-34 111 18 153 45 37 113 48 170 17Z" fill="url(#wing-violet-left)" stroke="#c4abd8" strokeOpacity="0.55" />
-          <path d="M266 208C295 142 387 40 470 72c46 18 34 111-18 153-45 37-113 48-170 17Z" fill="url(#wing-violet-right)" stroke="#c4abd8" strokeOpacity="0.55" />
-          <path d="M255 212C226 239 170 305 110 299c-47-5-58-63-13-89 45-25 105-23 158 2Z" fill="#654c78" fillOpacity="0.85" stroke="#bda3d1" strokeOpacity="0.4" />
-          <path d="M265 212C294 239 350 305 410 299c47-5 58-63 13-89-45-25-105-23-158 2Z" fill="#634b76" fillOpacity="0.85" stroke="#bda3d1" strokeOpacity="0.4" />
-          <g className="wing-lines" fill="none" stroke="#d7c9df" strokeOpacity="0.42" strokeWidth="1.25">
-            <path d="M254 202C190 167 128 116 76 101" />
-            <path d="M246 218C181 202 124 188 78 175" />
-            <path d="M260 205C322 167 392 115 444 101" />
-            <path d="M274 218C339 202 396 188 442 175" />
-            <path d="M248 234C199 255 158 275 119 281" />
-            <path d="M272 234C321 255 362 275 401 281" />
-          </g>
-        </g>
-        <path d="M260 150C244 177 245 235 260 277C275 235 276 177 260 150Z" fill="#211925" stroke="#d7c9df" strokeOpacity="0.55" />
-        <path d="M253 149C238 127 225 121 215 115M267 149C282 127 295 121 305 115" fill="none" stroke="#bca7ca" strokeWidth="2" strokeLinecap="round" />
-      </svg>
+      <ButterflyImage />
+    </div>
+  )
+}
+
+function ButterflyImage() {
+  return <img className="butterfly-image" src="/butterfly.png" alt="" draggable="false" />
+}
+
+function ButterflyTransition({
+  request,
+  onReveal,
+  onComplete,
+}: {
+  request: TransitionRequest
+  onReveal: () => void
+  onComplete: () => void
+}) {
+  const reducedMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+  // The overlay's timers mirror the CSS keyframes. The destination is switched
+  // only after the expanding field has obscured the current surface.
+  useEffect(() => {
+    const revealDelay = reducedMotion ? 70 : 650
+    const completeDelay = reducedMotion ? 190 : 1450
+    const revealTimer = window.setTimeout(onReveal, revealDelay)
+    const completeTimer = window.setTimeout(onComplete, completeDelay)
+    return () => {
+      window.clearTimeout(revealTimer)
+      window.clearTimeout(completeTimer)
+    }
+  }, [request.id, reducedMotion])
+
+  return (
+    <div className={`butterfly-transition transition-${request.direction}${reducedMotion ? ' is-reduced' : ''}`} aria-hidden="true">
+      <div className="transition-veil" />
+      <div className="transition-radiance" />
+      {!reducedMotion && (
+        <div className="transition-flight">
+          <DigitalTrail />
+          <div className="transition-butterfly-art">
+            <ButterflyImage />
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+function DigitalTrail() {
+  return (
+    <div className="digital-trail">
+      <span className="trail-core" />
+      {Array.from({ length: 13 }, (_, index) => <span className="trail-fragment" key={index} />)}
     </div>
   )
 }
@@ -203,9 +246,9 @@ function ChainStep({ number, title, copy }: { number: string; title: string; cop
 
 function ProductShell({ view, onNavigate, children }: { view: View; onNavigate: (view: View) => void; children: ReactNode }) {
   return (
-    <div className="product-screen page-transition">
+    <div className="product-screen">
       <header className="product-header">
-        <button className="brand-button" onClick={() => onNavigate('discovery')} aria-label="Go to Opportunity Discovery">
+        <button className="brand-button" onClick={() => onNavigate('entry')} aria-label="Go to FellaRide home">
           <span className="wordmark">FellaRide</span>
           <span className="brand-subtitle mono">OPPORTUNITY INTELLIGENCE</span>
         </button>
