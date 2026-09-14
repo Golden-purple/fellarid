@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 
 type View = 'entry' | 'discovery' | 'detail' | 'states'
@@ -101,10 +101,12 @@ function App() {
   const [stateMode, setStateMode] = useState<StateMode>('loading')
   const [transition, setTransition] = useState<TransitionRequest | null>(null)
   const [transitionId, setTransitionId] = useState(0)
+  const transitionLock = useRef(false)
   const selected = opportunities.find((opportunity) => opportunity.id === selectedId) ?? opportunities[1]
 
   const navigate = (target: View, opportunityId?: string) => {
-    if (transition || target === view) return
+    if (transitionLock.current || target === view) return
+    transitionLock.current = true
     if (opportunityId) setSelectedId(opportunityId)
 
     const direction: TransitionDirection = target === 'entry' || (view === 'detail' && target === 'discovery') ? 'reverse' : 'forward'
@@ -128,7 +130,10 @@ function App() {
           key={transition.id}
           request={transition}
           onReveal={() => setView(transition.target)}
-          onComplete={() => setTransition(null)}
+          onComplete={() => {
+            transitionLock.current = false
+            setTransition(null)
+          }}
         />
       )}
     </main>
@@ -147,17 +152,17 @@ function Entry({ onEnter }: { onEnter: () => void }) {
       <div className="entry-grid">
         <div className="entry-copy">
           <div className="eyebrow mono">THE CIVIC BUTTERFLY EFFECT</div>
-          <h1>A small public event signal creates a larger mobility and partnership opportunity.</h1>
+          <h1>Butterfly Effect into more opportunities</h1>
           <p>
-            FellaRide translates public event evidence into transparent, explainable Opportunities—so the moments worth noticing become easier to act on.
+            FellaRide translates public event evidence into transparent, explainable Opportunities. Events worth noticing become easier to capitalize.
           </p>
           <div className="entry-action-row">
             <button className="button button-primary" onClick={onEnter}>Enter Discovery</button>
-            <span className="entry-transition mono">Public evidence → FellaRide interpretation → Opportunity</span>
+            <span className="entry-transition mono">Public evidence | FellaRide interpretation | Opportunity</span>
           </div>
         </div>
 
-        <ButterflyMark />
+        {/* <ButterflyMark /> */}
       </div>
 
       <div className="entry-chain" aria-label="FellaRide opportunity flow">
@@ -181,6 +186,20 @@ function ButterflyMark() {
 
 function ButterflyImage() {
   return <img className="butterfly-image" src="/butterfly.png" alt="" draggable="false" />
+}
+
+function ButterflyFlight() {
+  return (
+    <div className="flight-butterfly">
+      <ButterflyImage />
+      <span className="flight-wing-mask flight-wing-left">
+        <ButterflyImage />
+      </span>
+      <span className="flight-wing-mask flight-wing-right">
+        <ButterflyImage />
+      </span>
+    </div>
+  )
 }
 
 function ButterflyTransition({
@@ -215,7 +234,7 @@ function ButterflyTransition({
         <div className="transition-flight">
           <DigitalTrail />
           <div className="transition-butterfly-art">
-            <ButterflyImage />
+            <ButterflyFlight />
           </div>
         </div>
       )}

@@ -163,10 +163,15 @@ button:focus-visible { outline: 2px solid var(--accent-soft); outline-offset: 3p
 .transition-veil { position: absolute; inset: -8%; z-index: 1; background: radial-gradient(circle at 50% 50%, rgba(24, 16, 31, .96), rgba(8, 7, 12, .98) 58%, rgba(3, 3, 6, .99)); opacity: 0; animation: transition-veil 1450ms cubic-bezier(.19, .78, .24, 1) both; }
 .transition-veil::after { position: absolute; content: ''; inset: 0; background: repeating-linear-gradient(180deg, transparent 0 5px, rgba(139, 112, 165, .08) 6px, transparent 7px); mix-blend-mode: screen; opacity: .7; }
 .transition-radiance { position: absolute; inset: -30%; z-index: 2; background: conic-gradient(from 210deg at 50% 50%, transparent 0 22%, rgba(113, 231, 242, .12) 27%, transparent 34%, rgba(240, 80, 208, .2) 40%, transparent 52%, rgba(139, 112, 165, .16) 62%, transparent 72%); filter: blur(24px); opacity: 0; mix-blend-mode: screen; animation: transition-radiance 1450ms ease-out both; }
-.transition-flight { position: absolute; top: 0; left: 0; z-index: 4; width: min(31vw, 360px); height: 310px; transform-origin: 50% 50%; animation: flight-forward 1320ms cubic-bezier(.12, .72, .18, 1) both; }
+.transition-flight { position: absolute; top: 0; left: 0; z-index: 4; width: min(31vw, 360px); height: 310px; transform-origin: 50% 50%; animation: flight-forward 2000ms cubic-bezier(.12, .72, .18, 1) both; }
 .transition-reverse .transition-flight { animation-name: flight-reverse; }
-.transition-butterfly-art { position: absolute; top: 0; right: 0; width: min(24vw, 280px); transform-origin: 50% 50%; filter: drop-shadow(-5px 0 rgba(113, 231, 242, .28)) drop-shadow(6px 0 rgba(240, 80, 208, .3)); animation: butterfly-wingbeat 190ms steps(2, end) infinite alternate; }
-.transition-butterfly-art .butterfly-image { width: 100%; height: auto; filter: saturate(1.2) contrast(1.1) brightness(1.12) drop-shadow(0 22px 28px rgba(0, 0, 0, .65)); }
+.transition-butterfly-art { position: absolute; top: 0; right: 0; width: min(24vw, 280px); transform-origin: 50% 50%; filter: drop-shadow(-5px 0 rgba(113, 231, 242, .28)) drop-shadow(6px 0 rgba(240, 80, 208, .3)); }
+.flight-butterfly { position: relative; width: 100%; aspect-ratio: 393 / 509; perspective: 820px; transform-style: preserve-3d; }
+.flight-butterfly > .butterfly-image { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; opacity: .62; filter: saturate(1.2) contrast(1.1) brightness(1.12) drop-shadow(0 22px 28px rgba(0, 0, 0, .65)); }
+.flight-wing-mask { position: absolute; inset: 0; display: block; transform-style: preserve-3d; backface-visibility: hidden; will-change: transform; }
+.flight-wing-mask .butterfly-image { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; filter: saturate(1.24) contrast(1.12) brightness(1.16) drop-shadow(0 10px 14px rgba(240, 80, 208, .18)); }
+.flight-wing-left { clip-path: polygon(15% 6%, 52% 7%, 49% 30%, 46% 46%, 42% 56%, 34% 55%, 24% 48%, 15% 42%, 7% 34%, 11% 20%); transform-origin: 47% 53%; animation: wing-flap-left 460ms cubic-bezier(.34, .04, .2, 1) infinite; }
+.flight-wing-right { clip-path: polygon(46% 8%, 86% 10%, 97% 18%, 94% 31%, 85% 43%, 74% 51%, 60% 57%, 49% 56%, 48% 38%); transform-origin: 51% 53%; animation: wing-flap-right 460ms cubic-bezier(.34, .04, .2, 1) infinite; }
 .digital-trail { position: absolute; top: 65px; left: -155px; width: 335px; height: 180px; transform: rotate(-3deg); filter: drop-shadow(0 0 10px rgba(139, 112, 165, .28)); }
 .trail-core { position: absolute; top: 82px; left: 10px; width: 290px; height: 5px; background: linear-gradient(90deg, transparent, rgba(113, 231, 242, .72) 35%, rgba(240, 80, 208, .86) 75%, transparent); filter: blur(4px); opacity: .8; }
 .trail-fragment { position: absolute; display: block; height: var(--fragment-height, 3px); left: var(--fragment-left, 40px); top: var(--fragment-top, 50px); width: var(--fragment-width, 120px); background: linear-gradient(90deg, transparent, rgba(139, 112, 165, .9) 12%, var(--fragment-color, rgba(240, 80, 208, .95)) 58%, transparent); clip-path: polygon(0 20%, 78% 0, 100% 34%, 87% 100%, 14% 72%); opacity: .72; animation: fragment-flicker 360ms steps(2, end) infinite alternate; }
@@ -212,9 +217,19 @@ button:focus-visible { outline: 2px solid var(--accent-soft); outline-offset: 3p
   89% { opacity: .8; transform: translate3d(6vw, 48vh, 0) rotate(4deg) scale(.9); }
   100% { opacity: 0; transform: translate3d(-31vw, 55vh, 0) rotate(14deg) scale(.46); }
 }
-@keyframes butterfly-wingbeat {
-  from { transform: scaleX(.92) scaleY(1); }
-  to { transform: scaleX(1.04) scaleY(.96); }
+@keyframes wing-flap-left {
+  0%, 100% { transform: rotateY(0deg) rotateZ(0deg) skewX(0deg) scaleX(1); }
+  18% { transform: rotateY(-15deg) rotateZ(-2deg) skewX(-2deg) scaleX(.96); }
+  38% { transform: translate3d(8px, 8px, 0) rotateY(-46deg) rotateZ(-7deg) skewX(-7deg) scaleX(.72); }
+  56% { transform: translate3d(3px, 4px, 0) rotateY(-17deg) rotateZ(-3deg) skewX(-2deg) scaleX(.92); }
+  78% { transform: translate3d(-2px, -2px, 0) rotateY(10deg) rotateZ(2deg) skewX(2deg) scaleX(1.04); }
+}
+@keyframes wing-flap-right {
+  0%, 100% { transform: rotateY(0deg) rotateZ(0deg) skewX(0deg) scaleX(1); }
+  18% { transform: rotateY(15deg) rotateZ(2deg) skewX(2deg) scaleX(.96); }
+  38% { transform: translate3d(-8px, 8px, 0) rotateY(46deg) rotateZ(7deg) skewX(7deg) scaleX(.72); }
+  56% { transform: translate3d(-3px, 4px, 0) rotateY(17deg) rotateZ(3deg) skewX(2deg) scaleX(.92); }
+  78% { transform: translate3d(2px, -2px, 0) rotateY(-10deg) rotateZ(-2deg) skewX(-2deg) scaleX(1.04); }
 }
 @keyframes fragment-flicker {
   from { opacity: .4; transform: translateX(0) scaleX(.82); }

@@ -127,9 +127,9 @@ Last updated: 2026-09-14
 | Border radius    | None; the overlay is viewport-scale |
 | Text — primary   | None; the layer is decorative and `aria-hidden` |
 | Text — secondary | None |
-| Spacing          | Fixed viewport overlay; one flight layer with a bounded 13-fragment trail |
+| Spacing          | Fixed viewport overlay; one flight layer with a bounded 13-fragment trail and two clipped wing layers |
 | Hover state      | None; pointer events remain disabled during navigation |
 | Shadow           | Controlled butterfly drop shadow plus limited cyan/magenta channel separation |
 | Accent usage     | Supplied RGB/glitch raster artwork with temporary cyan and magenta trail highlights |
 
-**Pattern notes:** The overlay is mounted only for navigation, travels diagonally across the viewport, and switches the destination at the trail expansion peak. Forward motion runs left-to-right; reverse motion runs right-to-left. Both the static Entry mark and the moving overlay use `public/butterfly-being.png`; future major-surface navigation should request this coordinator rather than duplicating butterfly markup. Reduced motion removes the flight and uses a short veil-only reveal.
+**Pattern notes:** The overlay is mounted only for navigation, travels diagonally across the viewport, and switches the destination at the trail expansion peak. Forward motion runs left-to-right; reverse motion runs right-to-left. Both the static Entry mark and the moving overlay use the canonical `public/butterfly.png`; wing masks reuse that same image and animate around separate roots to create the flap. Future major-surface navigation should request this coordinator rather than duplicating butterfly markup. Reduced motion removes the flight and uses a short veil-only reveal.
