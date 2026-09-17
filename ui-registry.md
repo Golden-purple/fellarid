@@ -97,6 +97,25 @@ Last updated: 2026-09-14
 
 **Pattern notes:** Detail always follows the evidence-led chain: public event evidence → FellaRide interpretation → score/factors → location/timing → provenance/limitations → partnership context.
 
+### Contact Overlay
+
+File: `src/App.tsx`, `src/styles.css`
+Last updated: 2026-09-17
+
+| Property         | Pattern |
+| ---------------- | ------- |
+| Background       | `rgba(8, 7, 12, .68)` backdrop keeps the dossier perceptible while muting it |
+| Border           | `1px solid #3D3647` on a raised `#221E29` dialog; interior sections use `#2B2633` dividers |
+| Border radius    | `12px` dialog, `8px` context group, `4px` close/control surfaces |
+| Text — primary   | `#E3E0E6`, Plus Jakarta Sans for the person and hierarchy |
+| Text — secondary | `#B7B1BC`; `#77707F` for demo disclaimers and quiet labels |
+| Spacing          | `22px` desktop dialog padding, `18px` mobile padding, 44px minimum close target |
+| Hover state      | Close controls lift contrast with the existing surface/border tokens; no new motion language |
+| Shadow           | None; tonal stepping and the restrained backdrop provide depth |
+| Accent usage     | `#A98FBD` for mono labels, avatar initials, role tag, and phone label |
+
+**Pattern notes:** Contact is a focused layer over the current opportunity dossier, not a separate profile route. The hierarchy is ride host → designation → role/route/event context → phone. The isolated demo object in `src/App.tsx` is intentionally replaceable with real contact data later. Closing via the X, footer action, backdrop, or Escape restores focus to the existing Contact trigger and releases body scroll. The 560px max-width card collapses to viewport-safe 16px gutters on mobile.
+
 ## Shared tokens
 
 - Canvas: `#121116` / `#141318`

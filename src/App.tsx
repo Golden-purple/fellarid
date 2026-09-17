@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import type { ReactNode } from 'react'
+import type { ReactNode, RefObject } from 'react'
 
 type View = 'entry' | 'discovery' | 'detail' | 'states'
 type StateMode = 'loading' | 'empty' | 'error'
@@ -42,6 +42,26 @@ type Opportunity = {
   factors: Factor[]
   demo?: boolean
   rideContext?: RideContext
+}
+
+type MockContact = {
+  initials: string
+  name: string
+  designation: string
+  phone: string
+  role: string
+  route: string
+  demoNote: string
+}
+
+const mockContact: MockContact = {
+  initials: 'AM',
+  name: 'Arjun Mehta',
+  designation: 'Software Engineer · Bengaluru',
+  phone: '+91 90000 12345',
+  role: 'Event Host',
+  route: 'Indiranagar - Koramangala',
+  demoNote: 'Demo contact · not a real phone number',
 }
 
 const opportunities: Opportunity[] = [
@@ -231,9 +251,11 @@ function App() {
   const [view, setView] = useState<View>('entry')
   const [selectedId, setSelectedId] = useState(opportunities[0].id)
   const [stateMode, setStateMode] = useState<StateMode>('loading')
+  const [contactOpen, setContactOpen] = useState(false)
   const [transition, setTransition] = useState<TransitionRequest | null>(null)
   const [transitionId, setTransitionId] = useState(0)
   const transitionLock = useRef(false)
+  const contactButtonRef = useRef<HTMLButtonElement>(null)
   const selected = opportunities.find((opportunity) => opportunity.id === selectedId) ?? opportunities[0]
 
   const navigate = (target: View, opportunityId?: string) => {
@@ -253,10 +275,11 @@ function App() {
       {view !== 'entry' && (
         <ProductShell view={view} onNavigate={navigate}>
           {view === 'discovery' && <Discovery onOpen={(id) => navigate('detail', id)} />}
-          {view === 'detail' && <Detail opportunity={selected} onBack={() => navigate('discovery')} />}
+          {view === 'detail' && <Detail opportunity={selected} onBack={() => navigate('discovery')} onContact={() => setContactOpen(true)} contactButtonRef={contactButtonRef} />}
           {view === 'states' && <States mode={stateMode} onModeChange={setStateMode} />}
         </ProductShell>
       )}
+      {contactOpen && <ContactOverlay opportunity={selected} onClose={() => setContactOpen(false)} triggerRef={contactButtonRef} />}
       {transition && (
         <ButterflyTransition
           key={transition.id}
@@ -269,6 +292,122 @@ function App() {
         />
       )}
     </main>
+  )
+}
+
+function ContactOverlay({
+  opportunity,
+  onClose,
+  triggerRef,
+}: {
+  opportunity: Opportunity
+  onClose: () => void
+  triggerRef: RefObject<HTMLButtonElement | null>
+}) {
+  const dialogRef = useRef<HTMLElement>(null)
+  const closeButtonRef = useRef<HTMLButtonElement>(null)
+  const closeTimerRef = useRef<number | null>(null)
+  const isClosingRef = useRef(false)
+  const [isClosing, setIsClosing] = useState(false)
+  const reducedMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  const route = opportunity.id === 'indiranagar-mohit-arijit-demo'
+    ? mockContact.route
+    : opportunity.rideContext
+      ? `${opportunity.rideContext.pickup} → ${opportunity.location}`
+      : `Community pickup → ${opportunity.location}`
+
+  const requestClose = () => {
+    if (isClosingRef.current) return
+    isClosingRef.current = true
+    setIsClosing(true)
+    closeTimerRef.current = window.setTimeout(onClose, reducedMotion ? 0 : 180)
+  }
+
+  useEffect(() => {
+    const previouslyFocused = document.activeElement as HTMLElement | null
+    const previousOverflow = document.body.style.overflow
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault()
+        requestClose()
+        return
+      }
+
+      if (event.key !== 'Tab') return
+      const focusable = Array.from(dialogRef.current?.querySelectorAll<HTMLElement>('button, a[href], [tabindex]:not([tabindex="-1"])') ?? [])
+      if (focusable.length === 0) return
+
+      const first = focusable[0]
+      const last = focusable[focusable.length - 1]
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault()
+        last.focus()
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault()
+        first.focus()
+      }
+    }
+
+    document.body.style.overflow = 'hidden'
+    document.addEventListener('keydown', handleKeyDown)
+    closeButtonRef.current?.focus()
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown)
+      if (closeTimerRef.current !== null) window.clearTimeout(closeTimerRef.current)
+      document.body.style.overflow = previousOverflow
+      const focusReturnTarget = triggerRef.current ?? previouslyFocused
+      focusReturnTarget?.focus()
+    }
+  }, [onClose, reducedMotion, triggerRef])
+
+  return (
+    <div
+      className={`contact-overlay${isClosing ? ' is-closing' : ''}`}
+      onMouseDown={(event) => {
+        if (event.target === event.currentTarget) requestClose()
+      }}
+    >
+      <section
+        ref={dialogRef}
+        className="contact-dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="contact-dialog-title"
+        aria-describedby="contact-dialog-description"
+        data-contact-dialog
+      >
+        <div className="contact-dialog-header">
+          <div className="contact-dialog-label mono"><span aria-hidden="true">•</span>HOST CONTACT</div>
+          <button ref={closeButtonRef} className="contact-close-icon" type="button" onClick={requestClose} aria-label="Close contact overlay">×</button>
+        </div>
+
+        <div className="contact-profile">
+          <div className="contact-avatar mono" aria-hidden="true">{mockContact.initials}</div>
+          <div>
+            <h2 id="contact-dialog-title">{mockContact.name}</h2>
+            <p>{mockContact.designation}</p>
+          </div>
+        </div>
+
+        <div className="contact-context" id="contact-dialog-description">
+          <div><span className="mono">ROLE</span><b className="contact-role-tag">{mockContact.role}</b></div>
+          <div><span className="mono">ROUTE</span><b>{route}</b></div>
+          <div><span className="mono">EVENT CONTEXT</span><b>{opportunity.title}</b></div>
+        </div>
+
+        <div className="contact-phone">
+          <span className="mono">PHONE</span>
+          <strong className="contact-phone-number mono">{mockContact.phone}</strong>
+          <p>{mockContact.demoNote}</p>
+        </div>
+
+        <div className="contact-dialog-footer">
+          <button className="button contact-close-button" type="button" onClick={requestClose}>Close</button>
+        </div>
+      </section>
+    </div>
   )
 }
 
@@ -511,7 +650,17 @@ function OpportunityRow({ opportunity, onOpen }: { opportunity: Opportunity; onO
   )
 }
 
-function Detail({ opportunity, onBack }: { opportunity: Opportunity; onBack: () => void }) {
+function Detail({
+  opportunity,
+  onBack,
+  onContact,
+  contactButtonRef,
+}: {
+  opportunity: Opportunity
+  onBack: () => void
+  onContact: () => void
+  contactButtonRef: RefObject<HTMLButtonElement | null>
+}) {
   return (
     <section className="content-wrap detail-wrap">
       <button className="back-link mono" onClick={onBack}>← Return to Opportunity Discovery</button>
@@ -569,7 +718,7 @@ function Detail({ opportunity, onBack }: { opportunity: Opportunity; onBack: () 
             <PanelLabel>Partnership context</PanelLabel>
             <h3>Prepare a conversation about the public event.</h3>
             <p>We try to make public venue and organizer context available for an outreach effort. Contact them for any information about the event.</p>
-            <button className="button button-primary">Contact</button>
+            <button ref={contactButtonRef} className="button button-primary" type="button" onClick={onContact}>Contact</button>
             <button className="text-link mono">View public source ↗</button>
           </section>
         </aside>
