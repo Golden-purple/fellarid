@@ -17,6 +17,16 @@ type Factor = {
   note: string
 }
 
+type RideContext = {
+  category: string
+  community: string
+  interested: number
+  ridesAvailable: number
+  ridesNeeded: number
+  distance: string
+  pickup: string
+}
+
 type Opportunity = {
   id: string
   rank: string
@@ -30,12 +40,134 @@ type Opportunity = {
   source: string
   limitation: string
   factors: Factor[]
+  demo?: boolean
+  rideContext?: RideContext
 }
 
 const opportunities: Opportunity[] = [
   {
-    id: 'mtcc-convergence',
+    id: 'indiranagar-mohit-arijit-demo',
     rank: '01',
+    title: 'Live Music Night by Mohit Chauhan & Arjit Singh — Indiranagar',
+    event: 'Illustrative two-star live set · Mohit Chauhan + Arijit Singh · Indiranagar community stage',
+    timing: 'Oct 25 · 19:30–22:30',
+    location: 'Indiranagar · 100 Feet Road',
+    interpretation:
+      'A sample evening concert context puts nearby students and young professionals around the same Indiranagar destination, with 86 people interested, 31 ride requests, and 18 community seats open for coordination.',
+    score: 90,
+    confidence: 'Moderate',
+    source: 'FellaRide demo scenario · illustrative lineup, not an announced booking',
+    limitation: 'Mohit Chauhan and Arijit Singh are not presented as a confirmed event pairing.',
+    demo: true,
+    rideContext: {
+      category: 'Music / Concert',
+      community: 'Indiranagar student + young professional community',
+      interested: 86,
+      ridesAvailable: 18,
+      ridesNeeded: 31,
+      distance: '4.8 km from local community',
+      pickup: 'Indiranagar Metro · 100 Feet Road',
+    },
+    factors: [
+      { name: 'Audience context', value: 91, note: 'Two recognizable performers create a strong illustrative evening draw.' },
+      { name: 'Location context', value: 88, note: 'Indiranagar venues and Metro access create a legible pickup geography.' },
+      { name: 'Mobility relevance', value: 93, note: 'Night timing and a concentrated destination make shared rides useful.' },
+      { name: 'Partnership potential', value: 78, note: 'The sample context is useful for testing a community coordination flow.' },
+    ],
+  },
+  {
+    id: 'church-street-weekend-demo',
+    rank: '02',
+    title: 'Church Street Weekend',
+    event: 'Illustrative street-culture Saturday · Church Street cafés, bookshops & live sets',
+    timing: 'Oct 26 · 16:00–21:00',
+    location: 'Church Street · MG Road',
+    interpretation:
+      'A walkable Church Street afternoon-to-evening sample brings 52 nearby people into the same social pocket, with 19 ride requests and 12 open community seats for a coordinated return journey.',
+    score: 84,
+    confidence: 'Moderate',
+    source: 'FellaRide demo scenario · Bengaluru community calendar format',
+    limitation: 'Sample timing and participation signals are illustrative, not a public event announcement.',
+    demo: true,
+    rideContext: {
+      category: 'Social / Community',
+      community: 'MG Road · Church Street student community',
+      interested: 52,
+      ridesAvailable: 12,
+      ridesNeeded: 19,
+      distance: '3.2 km from local community',
+      pickup: 'MG Road Metro · Church Street',
+    },
+    factors: [
+      { name: 'Audience context', value: 82, note: 'A dense mix of cafés, bookshops, and evening social activity supports interest.' },
+      { name: 'Location context', value: 90, note: 'Church Street and MG Road form a compact, familiar destination cluster.' },
+      { name: 'Mobility relevance', value: 86, note: 'A later return window makes coordinated pickup planning practical.' },
+      { name: 'Partnership potential', value: 73, note: 'The sample format offers a clear community-first outreach context.' },
+    ],
+  },
+  {
+    id: 'koramangala-visual-studio-demo',
+    rank: '03',
+    title: 'Bengaluru Tech Meetup — Microsoft Visual Studio feature program',
+    event: 'Illustrative developer community session · Visual Studio feature walkthrough · Koramangala',
+    timing: 'Oct 26 · 10:30–13:00',
+    location: 'Koramangala · Sony World Junction',
+    interpretation:
+      'A plausible developer-community sample gives CS students and young professionals a shared Koramangala destination, with 41 interested, 14 ride requests, and 9 seats available across nearby pickup groups.',
+    score: 80,
+    confidence: 'Moderate',
+    source: 'FellaRide demo scenario · community format, not an official Microsoft event',
+    limitation: 'The program name and participation signals are illustrative and should not be read as an official announcement.',
+    demo: true,
+    rideContext: {
+      category: 'Technology / Meetup',
+      community: 'Koramangala + HSR Layout CS community',
+      interested: 41,
+      ridesAvailable: 9,
+      ridesNeeded: 14,
+      distance: '7.6 km from local community',
+      pickup: 'Sony World Junction · Koramangala',
+    },
+    factors: [
+      { name: 'Audience context', value: 79, note: 'A focused developer audience creates a credible student and early-career cohort.' },
+      { name: 'Location context', value: 84, note: 'Koramangala tech venues are familiar to nearby HSR Layout communities.' },
+      { name: 'Mobility relevance', value: 77, note: 'A late-morning session suits planned shared rides from adjacent neighborhoods.' },
+      { name: 'Partnership potential', value: 80, note: 'The sample format makes community coordination easy to explain.' },
+    ],
+  },
+  {
+    id: 'cubbon-park-community-demo',
+    rank: '04',
+    title: 'Cubbon Park Community Meetup',
+    event: 'Illustrative Sunday community morning · Cubbon Park walking circle + sketch exchange',
+    timing: 'Oct 27 · 08:00–11:00',
+    location: 'Cubbon Park · Kasturba Road',
+    interpretation:
+      'A casual morning community sample gives 34 nearby people a shared park arrival, with 11 ride requests and 8 open seats around a low-pressure central Bengaluru meetup.',
+    score: 74,
+    confidence: 'Moderate',
+    source: 'FellaRide demo scenario · Bengaluru community activity format',
+    limitation: 'Sample activity details and participation signals are illustrative, not a confirmed public listing.',
+    demo: true,
+    rideContext: {
+      category: 'Community / Social',
+      community: 'Bengaluru central student + resident groups',
+      interested: 34,
+      ridesAvailable: 8,
+      ridesNeeded: 11,
+      distance: '2.1 km from local community',
+      pickup: 'Cubbon Park Gate 1 · MG Road',
+    },
+    factors: [
+      { name: 'Audience context', value: 67, note: 'A smaller, casual gathering suits a focused local community cohort.' },
+      { name: 'Location context', value: 86, note: 'Cubbon Park is central and easy to identify from several Metro approaches.' },
+      { name: 'Mobility relevance', value: 72, note: 'Morning timing allows simple pre-planned pickup coordination.' },
+      { name: 'Partnership potential', value: 70, note: 'The sample offers a gentle community use case for shared arrival.' },
+    ],
+  },
+  {
+    id: 'mtcc-convergence',
+    rank: '05',
     title: 'Metro Convention Centre Medical Summit & Gala Concurrency',
     event: '32nd Annual Global Cardiology Colloquium · MTCC South Building',
     timing: 'Oct 25 · 19:00–22:30',
@@ -55,7 +187,7 @@ const opportunities: Opportunity[] = [
   },
   {
     id: 'arena-convergence',
-    rank: '02',
+    rank: '06',
     title: 'Scotiabank Arena Back-to-Back Event Convergence',
     event: 'Toronto Maple Leafs vs. Boston Bruins · Scotiabank Arena',
     timing: 'Oct 25 · 21:45–23:00 demand window',
@@ -75,7 +207,7 @@ const opportunities: Opportunity[] = [
   },
   {
     id: 'old-town-culture',
-    rank: '03',
+    rank: '07',
     title: 'Meridian Hall & St. Lawrence Market Cultural Week Opening',
     event: 'International Ballet Gala · St. Lawrence Hall Civic Reception',
     timing: 'Oct 27 · 18:30–22:00',
@@ -97,12 +229,12 @@ const opportunities: Opportunity[] = [
 
 function App() {
   const [view, setView] = useState<View>('entry')
-  const [selectedId, setSelectedId] = useState(opportunities[1].id)
+  const [selectedId, setSelectedId] = useState(opportunities[0].id)
   const [stateMode, setStateMode] = useState<StateMode>('loading')
   const [transition, setTransition] = useState<TransitionRequest | null>(null)
   const [transitionId, setTransitionId] = useState(0)
   const transitionLock = useRef(false)
-  const selected = opportunities.find((opportunity) => opportunity.id === selectedId) ?? opportunities[1]
+  const selected = opportunities.find((opportunity) => opportunity.id === selectedId) ?? opportunities[0]
 
   const navigate = (target: View, opportunityId?: string) => {
     if (transitionLock.current || target === view) return
@@ -146,7 +278,7 @@ function Entry({ onEnter }: { onEnter: () => void }) {
       <div className="entry-topbar">
         <div className="wordmark">FellaRide</div>
         <div className="entry-product-label">Opportunity Intelligence</div>
-        <div className="entry-horizon mono">PUBLISHED HORIZON · TORONTO CENTRAL · OCT 24</div>
+        <div className="entry-horizon mono">BENGALURU LOCAL · CANADIAN HORIZON · OCT 24</div>
       </div>
 
       <div className="entry-grid">
@@ -276,7 +408,7 @@ function ProductShell({ view, onNavigate, children }: { view: View; onNavigate: 
           <button className={view === 'detail' ? 'nav-link active' : 'nav-link'} onClick={() => onNavigate('detail')}>Selected dossier</button>
           <button className={view === 'states' ? 'nav-link active' : 'nav-link'} onClick={() => onNavigate('states')}>State previews</button>
         </nav>
-        <div className="header-horizon mono">TORONTO CENTRAL · OCT 24</div>
+        <div className="header-horizon mono">BENGALURU LOCAL · CANADIAN HORIZON · OCT 24</div>
       </header>
       {children}
     </div>
@@ -288,17 +420,17 @@ function Discovery({ onOpen }: { onOpen: (id: string) => void }) {
     <section className="content-wrap">
       <div className="section-heading">
         <div>
-          <div className="eyebrow mono">RANKED OPPORTUNITIES · TORONTO</div>
+          <div className="eyebrow mono">RANKED OPPORTUNITIES · BENGALURU FIRST</div>
           <h2>Opportunity Discovery</h2>
-          <p>Public event evidence interpreted through the FellaRide lens, ranked with a transparent comparative heuristic.</p>
+          <p>Bengaluru sample signals are surfaced first, while Canadian public-event opportunities remain in the same FellaRide horizon and comparative heuristic.</p>
         </div>
-        <div className="heading-meta mono">3 OPPORTUNITIES · 14-DAY HORIZON</div>
+        <div className="heading-meta mono">7 OPPORTUNITIES · 14-DAY HORIZON</div>
       </div>
 
       <div className="filter-row">
         <button className="filter-button active">14-day horizon</button>
         <button className="filter-button">All event types</button>
-        <button className="filter-button">Evidence: verified</button>
+        <button className="filter-button">Evidence: verified + sample</button>
         <span className="filter-note mono">SCORE IS COMPARATIVE · NOT A PREDICTION</span>
       </div>
 
@@ -312,8 +444,9 @@ function Discovery({ onOpen }: { onOpen: (id: string) => void }) {
           <section className="surface-panel evidence-panel">
             <PanelLabel>Evidence Coverage</PanelLabel>
             <h3>Public context behind the ranking.</h3>
-            <p>Source families represented in this horizon, kept visible so every Opportunity can be questioned and followed back to its public origin.</p>
+            <p>Bengaluru sample opportunities are surfaced first, while Canadian public-event records remain visible below. Every item keeps its source context visible for questioning.</p>
             <div className="source-list">
+              <span>Bengaluru community calendars & sample listings</span>
               <span>Municipal permits & festivals</span>
               <span>Venue calendars</span>
               <span>Arena schedules</span>
@@ -353,11 +486,20 @@ function OpportunityRow({ opportunity, onOpen }: { opportunity: Opportunity; onO
     >
       <div className="row-rank mono">{opportunity.rank}</div>
       <div className="row-main">
-        <div className="row-kicker mono">OPPORTUNITY · {opportunity.confidence.toUpperCase()} CONFIDENCE</div>
+        <div className="row-kicker mono">{opportunity.demo ? 'DEMO OPPORTUNITY · SAMPLE CONTENT' : `OPPORTUNITY · ${opportunity.confidence.toUpperCase()} CONFIDENCE`}</div>
         <h3>{opportunity.title}</h3>
         <div className="event-context">{opportunity.event}</div>
         <div className="row-interpretation"><span className="mono">WHY IT RANKS</span>{opportunity.interpretation}</div>
-        <div className="row-meta mono"><span>{opportunity.timing}</span><span>{opportunity.location}</span><span>{opportunity.source}</span></div>
+        <div className="row-meta mono">
+          <span>{opportunity.timing}</span>
+          <span>{opportunity.location}</span>
+          {opportunity.rideContext && <>
+            <span>{opportunity.rideContext.category}</span>
+            <span>{opportunity.rideContext.interested} interested · {opportunity.rideContext.ridesNeeded} rides needed · {opportunity.rideContext.ridesAvailable} rides open</span>
+            <span>{opportunity.rideContext.distance}</span>
+          </>}
+          <span>{opportunity.source}</span>
+        </div>
       </div>
       <div className="row-score">
         <span className="score-label mono">OPPORTUNITY SCORE</span>
@@ -390,7 +532,7 @@ function Detail({ opportunity, onBack }: { opportunity: Opportunity; onBack: () 
         <div className="detail-main">
           <DetailSection number="01" label="UNDERLYING PUBLIC EVENT EVIDENCE">
             <h3>{opportunity.event}</h3>
-            <p>Public event context from venue calendars and civic schedules. The source entity is distinct from the FellaRide interpretation that follows.</p>
+            <p>{opportunity.demo ? 'Illustrative sample context for a Bengaluru community discovery experience. This is not a confirmed public event announcement.' : 'Public event context from venue calendars and civic schedules. The source entity is distinct from the FellaRide interpretation that follows.'}</p>
           </DetailSection>
           <DetailSection number="02" label="FELLARIDE OPPORTUNITY INTERPRETATION">
             <p>{opportunity.interpretation} This suggests a useful moment for partner mobility planning and an evidence-led conversation with the public organizer context.</p>
@@ -399,7 +541,12 @@ function Detail({ opportunity, onBack }: { opportunity: Opportunity; onBack: () 
             <div className="context-lines">
               <div><span className="mono">PICKUP & LOCATION</span><b>{opportunity.location}</b></div>
               <div><span className="mono">EVENT WINDOW</span><b>{opportunity.timing}</b></div>
-              <div><span className="mono">WHY IT MATTERS</span><b>Nearby public destinations and an evening timing window create a focused context for mobility relevance.</b></div>
+              <div><span className="mono">WHY IT MATTERS</span><b>Nearby public destinations and a defined event window create a focused context for mobility relevance.</b></div>
+              {opportunity.rideContext && <>
+                <div><span className="mono">EVENT TYPE</span><b>{opportunity.rideContext.category}</b></div>
+                <div><span className="mono">COMMUNITY SIGNAL</span><b>{opportunity.rideContext.interested} interested · {opportunity.rideContext.ridesNeeded} rides needed · {opportunity.rideContext.ridesAvailable} rides available · {opportunity.rideContext.distance}</b></div>
+                <div><span className="mono">COMMUNITY / PICKUP</span><b>{opportunity.rideContext.community} · {opportunity.rideContext.pickup}</b></div>
+              </>}
             </div>
           </DetailSection>
           <DetailSection number="04" label="EVIDENCE PROVENANCE & EVENT TIMING LIMITATIONS">
@@ -420,9 +567,9 @@ function Detail({ opportunity, onBack }: { opportunity: Opportunity; onBack: () 
           </section>
           <section className="surface-panel partnership-panel">
             <PanelLabel>Partnership context</PanelLabel>
-            <h3>Prepare a conversation grounded in the public event.</h3>
-            <p>Public venue and organizer context is available for an exploratory outreach brief. This is not a contact-management workflow.</p>
-            <button className="button button-primary">Prepare outreach</button>
+            <h3>Prepare a conversation about the public event.</h3>
+            <p>We try to make public venue and organizer context available for an outreach effort. Contact them for any information about the event.</p>
+            <button className="button button-primary">Contact</button>
             <button className="text-link mono">View public source ↗</button>
           </section>
         </aside>
